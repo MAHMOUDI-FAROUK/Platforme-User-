@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User API</title>
+</head>
+<body>
+<h1>User API</h1>
+
+<h2>Create User</h2>
+<form id="createUserForm">
+    <label for="userName">Name: </label>
+    <input type="text" id="userName" required><br>
+
+    <label for="userAdress">Address: </label>
+    <input type="text" id="userAdress" required><br>
+
+    <label for="userPhoneNumber">Phone Number: </label>
+    <input type="text" id="userPhoneNumber" required><br>
+
+    <button type="submit">Create User</button>
+</form>
+
+<h2>Users</h2>
+<ul id="userList"></ul>
+
+
+    const createUserForm = document.getElementById('createUserForm');
+    const userNameInput = document.getElementById('userName');
+    const userAddressInput = document.getElementById('userAddress');
+    const userPhoneNumberInput = document.getElementById('userPhoneNumber');
+    const userList = document.getElementById('userList');
+
+    createUserForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const user = {
+            userName: userNameInput.value,
+            userAddress: userAddressInput.value,
+            userPhoneNumber: userPhoneNumberInput.value
+        };
+
+        const response = await fetch('/api/users', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(user)
+        });
+
+        if (response.ok) {
+            // Clear input fields and fetch updated user list
+            userNameInput.value = '';
+            userAddressInput.value = '';
+            userPhoneNumberInput.value = '';
+            fetchUserList();
+        }
+    });
+
+    async function fetchUserList() {
+        userList.innerHTML = ''; // Clear the list first
+
+        const response = await fetch('/api/users');
+        const users = await response.json();
+
+        users.forEach(user => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `${user.userName}, ${user.userAddress}, ${user.userPhoneNumber}`;
+            userList.appendChild(listItem);
+        });
+    }
+
+    // Initial fetch to populate the user list
+    fetchUserList();
+
+</body>
+</html>
